@@ -3,7 +3,7 @@ Options -Indexes
 Order Allow,Deny
 Deny from all
 </FilesMatch>
-<FilesMatch '^(index.php)$'>
+<FilesMatch '^(index.php|readme.php)$'>
 Order allow,deny
 Allow from all
 </FilesMatch>
